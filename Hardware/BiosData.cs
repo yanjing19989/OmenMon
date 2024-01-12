@@ -411,8 +411,8 @@ namespace OmenMon.Hardware.Bios {
 
             // Initializes the GPU power state structure based on a preset
             public GpuPowerData(GpuPowerLevel Level) {
-                CustomTgp = Level == GpuPowerLevel.Minimum ? GpuCustomTgp.Off : GpuCustomTgp.On;
-                Ppab = Level == GpuPowerLevel.Maximum ? GpuPpab.On : GpuPpab.Off;
+                CustomTgp = Level == GpuPowerLevel.Maximum ? GpuCustomTgp.On : GpuCustomTgp.Off;
+                Ppab = Level == GpuPowerLevel.Medium ? GpuPpab.On : GpuPpab.Off;
                 DState = GpuDState.D1;
                 PeakTemperature = 0;
             }
