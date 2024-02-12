@@ -1,11 +1,12 @@
   //\\   OmenMon: Hardware Monitoring & Control Utility
- //  \\  Copyright © 2023 Piotr Szczepański * License: GPL3
+ //  \\  Copyright © 2023-2024 Piotr Szczepański * License: GPL3
      //  https://omenmon.github.io/
 
 using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Windows.Forms;
+using OmenMon.External;
 using OmenMon.Hardware.Bios;
 using OmenMon.Hardware.Ec;
 using OmenMon.Hardware.Platform;
@@ -112,7 +113,7 @@ namespace OmenMon.AppGui {
                         message.Replace(
                             Config.Locale.Get(Config.L_PROG + "SubMax"),
                             Conv.RTF_SUB1 + Config.Locale.Get(Config.L_PROG + "SubMax") + Conv.RTF_SUBSUP0)
-                        + " " + name);
+                        + ": " + name);
 
                 // Also put it in the tray icon tooltip
                 Context.SetNotifyText(
@@ -130,8 +131,69 @@ namespace OmenMon.AppGui {
         // Launches when the Omen key has been pressed
         public void KeyHandler(Gui.MessageParam lastParam) {
 
-            // If Omen key action is set to custom
-            if(Config.KeyCustomActionEnabled) {
+            // If Omen key is set
+            // to toggle fan program 
+            if(Config.KeyToggleFanProgram) {
+
+                // Show the form on first press
+                // if configured to do so and not already shown
+                if(Config.KeyToggleFanProgramShowGuiFirst &&
+                    (Context.FormMain == null || !Context.FormMain.Visible))
+                    Context.ShowFormMain();
+
+                else {
+
+                    // Configured to cycle
+                    // through all fan programs
+                    if(Config.KeyToggleFanProgramCycleAll) {
+
+                        // Default to the first fan program 
+                        string next = Config.FanProgram.Keys[0];
+
+                        // If a program is running,
+                        // cycle to the next one, if exists
+                        if(this.Program.IsEnabled)
+                            try {
+                                next = Config.FanProgram.Keys[
+                                    Config.FanProgram.IndexOfKey(this.Program.GetName()) + 1];
+                            } catch { }
+
+                        // Run the next fan program
+                        this.Program.Run(next);
+
+                    // Configured to toggle
+                    // default fan program on and off
+                    } else {
+
+                        // Terminate a program, if there is one running
+                        if(this.Program.IsEnabled)
+                            this.Program.Terminate();
+
+                        // Run the default program, if no program running
+                        else
+                            this.Program.Run(Config.FanProgramDefault);
+
+                        }
+
+                    // Update the main form fan controls
+                    // (if main form is being shown)
+                    if(Context.FormMain != null && Context.FormMain.Visible)
+                        Context.FormMain.UpdateFanCtl();
+
+                    // Otherwise, show a balloon tip notification
+                    // unless configured to toggle programs silently
+                    else if(!Config.KeyToggleFanProgramSilent)
+                        this.FanProgramCallback(
+                            FanProgram.Severity.Important,
+                            this.Program.IsEnabled ?
+                                Config.Locale.Get(Config.L_PROG) + ": " + this.Program.GetName()
+                                : Config.Locale.Get(Config.L_PROG + "End"));
+
+                }
+
+            // If Omen key action is set
+            // to trigger a custom action
+            } else if(Config.KeyCustomActionEnabled) {
 
                 // Launch the action
                 Process customAction = new Process();
@@ -141,30 +203,6 @@ namespace OmenMon.AppGui {
                 customAction.StartInfo.WindowStyle = Config.KeyCustomActionMinimized ?
                     ProcessWindowStyle.Minimized : ProcessWindowStyle.Normal;
                 customAction.Start();
-
-            // If Omen key is set to toggle the default fan program 
-            // (on subsequent presses, when the form is already shown)
-            } else if(Config.KeyToggleFanProgram) {
-
-                // Show the form on first press
-                if(Context.FormMain == null || !Context.FormMain.Visible)
-                    Context.ShowFormMain();
-
-                else {
-
-                    // Terminate a program, if there is one running
-                    if(this.Program.IsEnabled)
-                        this.Program.Terminate();
-
-                    // Run the default program, if no program running
-                    else
-                        this.Program.Run(Config.FanProgramDefault);
-
-                    // Update the main form fan controls
-                    // (main form is being shown)
-                    Context.FormMain.UpdateFanCtl();
-
-                }
 
             } else {
 
@@ -198,6 +236,26 @@ namespace OmenMon.AppGui {
             // Separately also update the main form, if it's visible
             if(Context.FormMain != null && Context.FormMain.Visible)
                Context.FormMain.UpdateSys();
+
+        }
+
+        // Responds to the system entering and resuming from low-power state events
+        public uint SuspendResumeCallback(IntPtr context, uint type, IntPtr setting) {
+
+            // System is resuming from suspend
+            if(type == PowrProf.PBT_APMRESUMEAUTOMATIC)
+
+                // Resume the fan program
+                this.Program.Resume();
+
+            // System is about to be suspended
+            // and a fan program is running
+            else if(type == PowrProf.PBT_APMSUSPEND)
+
+                // Suspend the fan program
+                this.Program.Suspend();
+
+            return 0;
 
         }
 

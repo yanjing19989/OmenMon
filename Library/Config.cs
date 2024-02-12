@@ -1,5 +1,5 @@
   //\\   OmenMon: Hardware Monitoring & Control Utility
- //  \\  Copyright © 2023 Piotr Szczepański * License: GPL3
+ //  \\  Copyright © 2023-2024 Piotr Szczepański * License: GPL3
      //  https://omenmon.github.io/
 
 using System;
@@ -194,6 +194,9 @@ namespace OmenMon.Library {
                     if(GetBool(xml, XmlPrefix + "FanProgramModeCheckFirst", out flag))
                         FanProgramModeCheckFirst = flag;
 
+                    if(GetBool(xml, XmlPrefix + "FanProgramSuspend", out flag))
+                        FanProgramSuspend = flag;
+
                     GpuPowerDefault =
                         GetString(xml, XmlPrefix + "GpuPowerDefault");
 
@@ -223,6 +226,15 @@ namespace OmenMon.Library {
 
                     if(GetBool(xml, XmlPrefix + "KeyToggleFanProgram", out flag))
                         KeyToggleFanProgram = flag;
+
+                    if(GetBool(xml, XmlPrefix + "KeyToggleFanProgramCycleAll", out flag))
+                        KeyToggleFanProgramCycleAll = flag;
+
+                    if(GetBool(xml, XmlPrefix + "KeyToggleFanProgramShowGuiFirst", out flag))
+                        KeyToggleFanProgramShowGuiFirst = flag;
+
+                    if(GetBool(xml, XmlPrefix + "KeyToggleFanProgramSilent", out flag))
+                        KeyToggleFanProgramSilent = flag;
 
                     if(GetWord(xml, XmlPrefix + "PresetRefreshRateHigh", out value))
                         PresetRefreshRateHigh = value;
@@ -448,6 +460,7 @@ namespace OmenMon.Library {
                     SetString(xml, XmlPrefix + "FanProgramDefault", FanProgramDefault);
                     SetString(xml, XmlPrefix + "FanProgramDefaultAlt", FanProgramDefaultAlt);
                     SetBool(xml, XmlPrefix + "FanProgramModeCheckFirst", FanProgramModeCheckFirst);
+                    SetBool(xml, XmlPrefix + "FanProgramSuspend", FanProgramSuspend);
 
                     // Fan programs (again, so that the settings are
                     // sorted alphabetically for the user's convenience)
@@ -513,6 +526,9 @@ namespace OmenMon.Library {
                     SetString(xml, XmlPrefixKeyCustomAction + "ExecArgs", KeyCustomActionExecArgs);
                     SetBool(xml, XmlPrefixKeyCustomAction + "Minimized", KeyCustomActionMinimized);
                     SetBool(xml, XmlPrefix + "KeyToggleFanProgram", KeyToggleFanProgram);
+                    SetBool(xml, XmlPrefix + "KeyToggleFanProgramCycleAll", KeyToggleFanProgramCycleAll);
+                    SetBool(xml, XmlPrefix + "KeyToggleFanProgramShowGuiFirst", KeyToggleFanProgramShowGuiFirst);
+                    SetBool(xml, XmlPrefix + "KeyToggleFanProgramSilent", KeyToggleFanProgramSilent);
                     SetUInt(xml, XmlPrefix + "PresetRefreshRateHigh", (uint) PresetRefreshRateHigh);
                     SetUInt(xml, XmlPrefix + "PresetRefreshRateLow", (uint) PresetRefreshRateLow);
 

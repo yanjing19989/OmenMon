@@ -1,5 +1,5 @@
 ﻿  //\\   OmenMon: Hardware Monitoring & Control Utility
- //  \\  Copyright © 2023 Piotr Szczepański * License: GPL3
+ //  \\  Copyright © 2023-2024 Piotr Szczepański * License: GPL3
      //  https://omenmon.github.io/
 
 using System;
@@ -231,6 +231,9 @@ namespace OmenMon.Hardware.Ec {
                 if(Ring0.IsOpen) {
                     this.IsInitialized = true;
                     EmbeddedControllerMutex.Open();
+                } else {
+                    // Report driver installation failure details
+                    App.Error(Ring0.GetStatus());
                 }
             }
         }

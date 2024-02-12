@@ -1,5 +1,5 @@
   //\\   OmenMon: Hardware Monitoring & Control Utility
- //  \\  Copyright © 2023 Piotr Szczepański * License: GPL3
+ //  \\  Copyright © 2023-2024 Piotr Szczepański * License: GPL3
      //  https://omenmon.github.io/
 
 using System;
@@ -93,8 +93,8 @@ namespace OmenMon.Library {
         public static List<string> FanModesSticky = new List<string> { "Default", "Performance", "Cool" };
 
         // Fan programs (populated at runtime)
-        public static SortedDictionary<string, FanProgramData> FanProgram =
-            new SortedDictionary<string, FanProgramData>();
+        public static SortedList<string, FanProgramData> FanProgram =
+            new SortedList<string, FanProgramData>();
 
         // Default fan program, which might be loaded on startup
         public static string FanProgramDefault; // Unset by default, since there is no default fan program
@@ -105,6 +105,10 @@ namespace OmenMon.Library {
         // Whether to check first (using the EC) if the fan mode is not set already
         // before setting it (using a BIOS WMI call) when a fan program is running
         public static bool FanProgramModeCheckFirst = false;
+
+        // If true, fan program will be suspended whenever the system enters low-power mode
+        // such as sleep, standby or hibernation, to be automatically re-enabled upon resume
+        public static bool FanProgramSuspend = true;
 
         // Configuration XML file path
         public static string FilePath = "";
@@ -215,10 +219,20 @@ namespace OmenMon.Library {
         public static string KeyCustomActionExecArgs = "";
         public static bool KeyCustomActionMinimized = false;
 
-        // If the application window is already shown on screen,
-        // and custom action is disabled, subsequent Omen key
-        // presses toggle the default fan program on and off
+        // Use the Omen key to control fan program
+        // (as long as KeyCustomAction is set to false)
         public static bool KeyToggleFanProgram = false;
+
+        // If true, Omen key cycles through all fan programs,
+        // instead of toggling the default fan program on and off
+        public static bool KeyToggleFanProgramCycleAll = true;
+
+        // Show window first Omen key press (if not shown already),
+        // before using subsequent keypresses to control fan program
+        public static bool KeyToggleFanProgramShowGuiFirst = true;
+
+        // Do not show a balloon tip notification when changing programs
+        public static bool KeyToggleFanProgramSilent = false;
 
         // Localizable string prefixes and suffixes
         public const string L_CLI = "Cli";

@@ -103,6 +103,10 @@
              at the cost of one more WMI BIOS call: can be used to reduce EC load) -->
         <FanProgramModeCheckFirst>false</FanProgramModeCheckFirst>
 
+        <!-- If true, fan program will be suspended whenever the system enters low-power mode
+             such as sleep, standby or hibernation, to be automatically re-enabled upon resume -->
+        <FanProgramSuspend>true</FanProgramSuspend>
+
         <!-- Fan program definitions
              Curve visualization: https://www.desmos.com/calculator/6vfpghtud0
                                   (editable initial data for the Power program) -->
@@ -195,10 +199,20 @@
             <Minimized>true</Minimized>
         </KeyCustomAction>
 
-        <!-- If the application window is already shown on screen,
-             and custom action is disabled, subsequent Omen key
-             presses toggle the default fan program on and off -->
+        <!-- Use the Omen key to control fan program
+             (as long as KeyCustomAction is set to false) -->
         <KeyToggleFanProgram>false</KeyToggleFanProgram>
+
+        <!-- If true, Omen key cycles through all fan programs,
+             instead of toggling the default fan program on and off -->
+        <KeyToggleFanProgramCycleAll>true</KeyToggleFanProgramCycleAll>
+
+        <!-- Show window upon first Omen key press (if not shown already),
+             before using subsequent keypresses to control fan program -->
+        <KeyToggleFanProgramShowGuiFirst>true</KeyToggleFanProgramShowGuiFirst>
+
+        <!-- Do not show a balloon tip notification when changing programs -->
+        <KeyToggleFanProgramSilent>false</KeyToggleFanProgramSilent>
 
         <!-- Preset Settings -->
 
