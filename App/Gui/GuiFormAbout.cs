@@ -37,6 +37,7 @@ namespace OmenMon.AppGui {
 
             // Initialize the form components
             Initialize();
+            Gui.ApplyDarkModeToForm(this); // 应用暗黑模式
 
             this.RtfAppInfo.Rtf = Conv.GetUnicodeStringRtf(text != "" ? text : Config.Locale.Get(Config.L_GUI_ABOUT + "Text"));
             this.Text = title != "" ? title : Config.Locale.Get(Config.L_GUI_ABOUT + "Title");
@@ -148,7 +149,7 @@ namespace OmenMon.AppGui {
             this.TblLayout.SetColumnSpan(this.RtfAppInfo, 2);
             this.RtfAppInfo.DetectUrls = false;
             this.RtfAppInfo.Dock = DockStyle.Fill;
-            this.RtfAppInfo.Enabled = false;
+            // this.RtfAppInfo.Enabled = false;
             this.RtfAppInfo.Location = new Point(30, 195);
             this.RtfAppInfo.Margin = new Padding(30, 3, 30, 3);
             this.RtfAppInfo.Name = Gui.T_RTF + "AppInfo";
@@ -167,6 +168,8 @@ namespace OmenMon.AppGui {
             this.LnkAppLink.TabIndex = 6;
             this.LnkAppLink.TabStop = false;
             this.LnkAppLink.TextAlign = ContentAlignment.MiddleRight;
+            this.LnkAppLink.LinkColor = Color.FromArgb(58, 150, 221);
+            this.LnkAppLink.ActiveLinkColor = Color.FromArgb(0, 200, 255);
 
             // Button to close the dialog
             this.BtnAccept.Anchor = ((AnchorStyles) (AnchorStyles.Bottom | AnchorStyles.Right));

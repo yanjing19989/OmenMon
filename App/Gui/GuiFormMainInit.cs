@@ -463,7 +463,7 @@ namespace OmenMon.AppGui {
             this.RtfSysInfo.BorderStyle = BorderStyle.None;
             this.RtfSysInfo.Cursor = Cursors.Arrow;
             this.RtfSysInfo.DetectUrls = false;
-            this.RtfSysInfo.Enabled = false;
+            // this.RtfSysInfo.Enabled = false;
             this.RtfSysInfo.Location = new Point(6, 16);
             this.RtfSysInfo.Name = Gui.T_RTF + Gui.G_SYS + "Info";
             this.RtfSysInfo.ReadOnly = true;

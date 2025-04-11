@@ -67,6 +67,7 @@ namespace OmenMon.AppGui {
 
             // Initialize the form components
             Initialize();
+            Gui.ApplyDarkModeToForm(this);
 
             // Pre-populate the last DPI setting to the value at launch
             this.LastDpi = (int) Gui.GetDeviceContextDpi(IntPtr.Zero);
