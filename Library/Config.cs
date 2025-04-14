@@ -283,7 +283,7 @@ namespace OmenMon.Library {
                     SysInfoRtfHeader = SysInfoRtfPreHeader + 
                         "{\\colortbl;"
                         + Conv.GetColorStringRtf(SystemColors.GrayText.ToArgb())  // System Gray
-                        + Conv.GetColorStringRtf(0)                               // Black
+                        + Conv.GetColorStringRtf(Color.White.ToArgb())            // White
                         + Conv.GetColorStringRtf(GuiColorTextTeal)                // Teal
                         + Conv.GetColorStringRtf(GuiColorWarmDark)                // Red
                         + Conv.GetColorStringRtf(GuiColorTextBlue)                // Blue

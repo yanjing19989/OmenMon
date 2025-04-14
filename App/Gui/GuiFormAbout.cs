@@ -101,7 +101,7 @@ namespace OmenMon.AppGui {
             this.TblLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 164F));
             this.TblLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 14F));
             this.TblLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 14F));
-            this.TblLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 50F));
+            this.TblLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F));
             this.TblLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 27F));
             this.TblLayout.Size = new Size(372, 269);
             this.TblLayout.TabIndex = 1;
@@ -155,7 +155,7 @@ namespace OmenMon.AppGui {
             this.RtfAppInfo.Name = Gui.T_RTF + "AppInfo";
             this.RtfAppInfo.ReadOnly = true;
             this.RtfAppInfo.ScrollBars = RichTextBoxScrollBars.None;
-            this.RtfAppInfo.Size = new Size(312, 44);
+            this.RtfAppInfo.Size = new Size(312, 55);
             this.RtfAppInfo.TabIndex = 5;
             this.RtfAppInfo.TabStop = false;
 
@@ -194,7 +194,7 @@ namespace OmenMon.AppGui {
             this.AcceptButton = this.BtnAccept;
             this.AutoScaleDimensions = new SizeF(6F, 13F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.ClientSize = new Size(384, 281);
+            this.ClientSize = new Size(384, 292);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;

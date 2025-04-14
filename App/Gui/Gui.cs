@@ -169,6 +169,8 @@ namespace OmenMon.AppGui {
                 }
                 else if (control is GroupBox) {
                     // 特殊处理GroupBox
+                    control.BackColor = Color.FromArgb(30, 30, 30);
+                    control.ForeColor = Color.White;
                     control.Paint += (s, e) => {
                         var box = s as GroupBox;
                         DrawDarkGroupBox(box, e.Graphics);
