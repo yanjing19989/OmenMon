@@ -202,6 +202,7 @@ namespace OmenMon.AppGui {
             this.Padding = new Padding(6);
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
+            this.FormBorderStyle = FormBorderStyle.None;
             this.StartPosition = FormStartPosition.CenterScreen;
 #endregion
 

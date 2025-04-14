@@ -678,6 +678,7 @@ namespace OmenMon.AppGui {
             this.SizeGripStyle = SizeGripStyle.Hide;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Text = Config.Locale.Get(Config.L_GUI_MAIN + "Title");
+            this.FormBorderStyle = FormBorderStyle.None;
 #endregion
 
 #region Tool Tips
