@@ -679,6 +679,9 @@ namespace OmenMon.AppGui {
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Text = Config.Locale.Get(Config.L_GUI_MAIN + "Title");
             this.FormBorderStyle = FormBorderStyle.None;
+            
+            // 确保鼠标事件能够在窗体的任何位置触发
+            this.Cursor = Cursors.Default;
 #endregion
 
 #region Tool Tips
