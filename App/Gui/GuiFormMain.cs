@@ -927,7 +927,12 @@ namespace OmenMon.AppGui {
             Label labelValue = ((Label) this.GrpTmp.Controls[this.GrpTmp.Controls.IndexOf(labelCaption) + 1]);
 
             // Update the status
-            labelCaption.Enabled = value > 0;
+            if(Gui.GetThemeColors().IsDark) {
+                labelCaption.Enabled = true;
+                labelCaption.ForeColor = value > 0 ?
+                    Gui.GetThemeColors().Text : Gui.GetThemeColors().MutedText;
+            } else
+                labelCaption.Enabled = value > 0;
 
             // Update the value
             labelValue.Text = value == 0 ? "" :

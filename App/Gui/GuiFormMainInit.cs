@@ -381,7 +381,7 @@ namespace OmenMon.AppGui {
             this.GrpFan.Controls.Add(this.TrkFan1Lvl);
 
             // Fan group settings
-            this.GrpFan.Location = new Point(416, 68);
+            this.GrpFan.Location = new Point(416, 78);
             this.GrpFan.Name = Gui.T_GRP + Gui.G_FAN;
             this.GrpFan.Size = new Size(287, 185);
             this.GrpFan.TabIndex = 3;
@@ -449,7 +449,7 @@ namespace OmenMon.AppGui {
             this.GrpKbd.Controls.Add(this.TxtKbdColorVal);
 
             // Keyboard group settings
-            this.GrpKbd.Location = new Point(6, 68);
+            this.GrpKbd.Location = new Point(6, 78);
             this.GrpKbd.Name = Gui.T_GRP + Gui.G_KBD;
             this.GrpKbd.Size = new Size(405, 185);
             this.GrpKbd.TabIndex = 2;
@@ -469,7 +469,7 @@ namespace OmenMon.AppGui {
             this.RtfSysInfo.ReadOnly = true;
             this.RtfSysInfo.ScrollBars = RichTextBoxScrollBars.None;
             this.RtfSysInfo.ShortcutsEnabled = false;
-            this.RtfSysInfo.Size = new Size(277, 43);
+            this.RtfSysInfo.Size = new Size(277, 53);
             this.RtfSysInfo.TabIndex = 0;
             this.RtfSysInfo.TabStop = false;
             this.RtfSysInfo.WordWrap = false;
@@ -485,7 +485,7 @@ namespace OmenMon.AppGui {
             // System status group settings
             this.GrpSys.Location = new Point(6, 3);
             this.GrpSys.Name = Gui.T_GRP + Gui.G_SYS;
-            this.GrpSys.Size = new Size(287, 65);
+            this.GrpSys.Size = new Size(287, 75);
             this.GrpSys.TabIndex = 0;
             this.GrpSys.TabStop = false;
             this.GrpSys.Text = Config.Locale.Get(Config.L_GUI_MAIN + Gui.G_SYS).Replace("&", "&&");
@@ -650,7 +650,7 @@ namespace OmenMon.AppGui {
             // Temperature group settings
             this.GrpTmp.Location = new Point(298, 3);
             this.GrpTmp.Name = Gui.T_GRP + Gui.G_TMP;
-            this.GrpTmp.Size = new Size(405, 65);
+            this.GrpTmp.Size = new Size(405, 75);
             this.GrpTmp.TabIndex = 1;
             this.GrpTmp.TabStop = false;
             this.GrpTmp.Text = Config.Locale.Get(Config.L_GUI_MAIN + Gui.G_TMP).Replace("&", "&&");
@@ -674,7 +674,7 @@ namespace OmenMon.AppGui {
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = Gui.T_FRM + "Main";
-            this.Size = new Size(725, 300);
+            this.Size = new Size(725, 310);
             this.SizeGripStyle = SizeGripStyle.Hide;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Text = Config.Locale.Get(Config.L_GUI_MAIN + "Title");
