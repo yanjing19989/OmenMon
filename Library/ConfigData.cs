@@ -294,15 +294,25 @@ namespace OmenMon.Library {
         // System information rich-text field settings
         public const string SysInfoRtfPreHeader = "{\\rtf1\\ansi\\ansicpg1252\\deff0";
         public static string SysInfoRtfHeader = SysInfoRtfPreHeader +
-            "{\\colortbl;" // Overriden at runtime, in case the color values changed (currently won't)
-            + Conv.GetColorStringRtf(SystemColors.GrayText.ToArgb())  // System Gray
-            + Conv.GetColorStringRtf(0)                               // Black
-            + Conv.GetColorStringRtf(GuiColorTextTeal)                // Teal
-            + Conv.GetColorStringRtf(GuiColorWarmDark)                // Red
-            + Conv.GetColorStringRtf(GuiColorTextBlue)                // Blue
-            + Conv.GetColorStringRtf(GuiColorWarmLite)                // Fuchsia
-            + "}";
+            GetSysInfoRtfColorTable(0);
         public const string SysInfoRtfFooter = " }";
+
+        // Gets the RTF header for the system information field
+        public static string GetSysInfoRtfHeader(int primaryTextColor) {
+            return SysInfoRtfPreHeader + GetSysInfoRtfColorTable(primaryTextColor);
+        }
+
+        // Gets the RTF color table for the system information field
+        public static string GetSysInfoRtfColorTable(int primaryTextColor) {
+            return "{\\colortbl;" // Overriden at runtime, in case the color values changed (currently won't)
+                + Conv.GetColorStringRtf(SystemColors.GrayText.ToArgb())  // System Gray
+                + Conv.GetColorStringRtf(primaryTextColor)                // Primary text
+                + Conv.GetColorStringRtf(GuiColorTextTeal)                // Teal
+                + Conv.GetColorStringRtf(GuiColorWarmDark)                // Red
+                + Conv.GetColorStringRtf(GuiColorTextBlue)                // Blue
+                + Conv.GetColorStringRtf(GuiColorWarmLite)                // Fuchsia
+                + "}";
+        }
 
         // Folder where scheduled tasks are stored
         public const string TaskFolder = "\\";

@@ -67,6 +67,7 @@ namespace OmenMon.AppGui {
 
             // Initialize the form components
             Initialize();
+            Gui.ApplyTheme(this);
 
             // Pre-populate the last DPI setting to the value at launch
             this.LastDpi = (int) Gui.GetDeviceContextDpi(IntPtr.Zero);
@@ -398,7 +399,7 @@ namespace OmenMon.AppGui {
         private void EventColorInput(object sender, EventArgs e) {
             try {
                 Kbd.SetColors(new BiosData.ColorTable(this.TxtKbdColorVal.Text));
-                this.TxtKbdColorVal.ForeColor = Color.Empty;
+                this.TxtKbdColorVal.ForeColor = Gui.GetThemeColors().Text;
             } catch {
                 this.TxtKbdColorVal.ForeColor = Color.Red;
             }
@@ -779,7 +780,7 @@ namespace OmenMon.AppGui {
         public void UpdateKbd() {
 
             // Restore the default color of the color as parameter text box
-            this.TxtKbdColorVal.ForeColor = Color.Empty;
+            this.TxtKbdColorVal.ForeColor = Gui.GetThemeColors().Text;
 
             // Disable the backlight toggle for unsupported devices,
             // otherwise update the keyboard backlight status
@@ -895,7 +896,7 @@ namespace OmenMon.AppGui {
         // Update the system status rich-text field
         private void UpdateSysRtf() {
             this.RtfSysInfo.Rtf =
-                Config.SysInfoRtfHeader
+                Config.GetSysInfoRtfHeader(Gui.GetThemeColors().Text.ToArgb())
                 + Conv.GetUnicodeStringRtf(this.SysInfo)
                 + Conv.GetUnicodeStringRtf(this.SysStatus)
                 + Config.SysInfoRtfFooter;

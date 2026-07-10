@@ -37,8 +37,10 @@ namespace OmenMon.AppGui {
 
             // Initialize the form components
             Initialize();
+            Gui.ApplyTheme(this);
 
             this.RtfAppInfo.Rtf = Conv.GetUnicodeStringRtf(text != "" ? text : Config.Locale.Get(Config.L_GUI_ABOUT + "Text"));
+            ApplyRtfTheme(text == "");
             this.Text = title != "" ? title : Config.Locale.Get(Config.L_GUI_ABOUT + "Title");
 
         }
@@ -226,6 +228,18 @@ namespace OmenMon.AppGui {
 #endregion
 
 #region Event Handlers
+        // Applies dark theme colors to default RTF text without changing error colors
+        private void ApplyRtfTheme(bool isDefaultText) {
+            Gui.ThemeColors theme = Gui.GetThemeColors();
+            if(!theme.IsDark || !isDefaultText)
+                return;
+
+            this.RtfAppInfo.SelectAll();
+            this.RtfAppInfo.SelectionColor = theme.Text;
+            this.RtfAppInfo.SelectionBackColor = theme.FormBack;
+            this.RtfAppInfo.DeselectAll();
+        }
+
         // Handles a click on the only button
         private void EventActionClose(object sender, EventArgs e) {
             this.Close();

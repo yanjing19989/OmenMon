@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Windows.Forms;
 using OmenMon.Hardware.Bios;
 using OmenMon.Hardware.Ec;
@@ -15,6 +16,28 @@ namespace OmenMon.AppGui {
 #region Renderer Override
     // Overrides the menu renderer
     public class GuiMenuCustomRenderer : ToolStripProfessionalRenderer {
+
+        // Dark mode menu color table
+        private class DarkColorTable : ProfessionalColorTable {
+            public override Color ToolStripDropDownBackground => Color.FromArgb(45, 45, 48);
+            public override Color ImageMarginGradientBegin => Color.FromArgb(45, 45, 48);
+            public override Color ImageMarginGradientMiddle => Color.FromArgb(45, 45, 48);
+            public override Color ImageMarginGradientEnd => Color.FromArgb(45, 45, 48);
+            public override Color MenuBorder => Color.FromArgb(72, 72, 72);
+            public override Color MenuItemBorder => Color.FromArgb(72, 72, 72);
+            public override Color MenuItemSelected => Color.FromArgb(62, 62, 64);
+            public override Color MenuItemSelectedGradientBegin => Color.FromArgb(62, 62, 64);
+            public override Color MenuItemSelectedGradientEnd => Color.FromArgb(62, 62, 64);
+            public override Color MenuItemPressedGradientBegin => Color.FromArgb(70, 70, 75);
+            public override Color MenuItemPressedGradientEnd => Color.FromArgb(70, 70, 75);
+        }
+
+        // Stores whether the menu should be rendered dark
+        private bool IsDark = Gui.IsDarkTheme();
+
+        // Constructs the custom renderer
+        public GuiMenuCustomRenderer()
+            : base(Gui.IsDarkTheme() ? new DarkColorTable() : new ProfessionalColorTable()) { }
 
         // Checks if an item is tagged as not selectable
         private bool IsNoSelect(object item) {
@@ -32,6 +55,29 @@ namespace OmenMon.AppGui {
             if(!IsNoSelect(e.Item.Tag))
                base.OnRenderMenuItemBackground(e);
 
+        }
+
+        // Overrides the menu item text color in dark mode
+        protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e) {
+            if(IsDark) {
+                e.TextColor = e.Item.Enabled ?
+                    Gui.GetThemeColors().Text : Gui.GetThemeColors().MutedText;
+            }
+
+            base.OnRenderItemText(e);
+        }
+
+        // Overrides separator rendering in dark mode
+        protected override void OnRenderSeparator(ToolStripSeparatorRenderEventArgs e) {
+            if(!IsDark) {
+                base.OnRenderSeparator(e);
+                return;
+            }
+
+            using(Pen pen = new Pen(Gui.GetThemeColors().Border)) {
+                int y = e.Item.Height / 2;
+                e.Graphics.DrawLine(pen, 4, y, e.Item.Width - 4, y);
+            }
         }
 
     }
@@ -692,6 +738,7 @@ namespace OmenMon.AppGui {
             Context.Notification.ContextMenuStrip.Items[I_APPLANG].Tag = MENU_TAG_NO_SELECT + MENU_TAG_PERSIST;
             Context.Notification.ContextMenuStrip.Items[I_APPLANG].Enabled = false;
             Context.Notification.ContextMenuStrip.Items[I_APPLANG].Visible = Config.Locale.Get(Config.L_GUI + "Translated") == "" ? false : true;
+            Gui.ApplyTheme(Context.Notification.ContextMenuStrip);
 
         }
 

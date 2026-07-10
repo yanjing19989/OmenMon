@@ -6,6 +6,7 @@ using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using Microsoft.Win32;
 using OmenMon.External;
 using OmenMon.Library;
 
@@ -37,7 +38,12 @@ namespace OmenMon.AppGui {
         }
 
         // Default dialog font name
-        public const string DIALOG_FONT = "MS Shell Dlg"; 
+        public const string DIALOG_FONT = "MS Shell Dlg";
+
+        // Windows application theme registry location
+        private const string REG_PERSONALIZE_KEY =
+            "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize";
+        private const string REG_APPS_USE_LIGHT_THEME = "AppsUseLightTheme";
 
         // Message box flags
         public const int MB_SYSTEMMODAL = 0x00001000;  // On top of other topmost windows
@@ -115,6 +121,200 @@ namespace OmenMon.AppGui {
             // Set the state flag
             IsInitialized = false;
 
+        }
+#endregion
+
+#region Theme
+        // Colors used for the current GUI theme
+        public struct ThemeColors {
+            public bool IsDark;
+            public Color FormBack;
+            public Color ControlBack;
+            public Color InputBack;
+            public Color Text;
+            public Color MutedText;
+            public Color Border;
+            public Color Highlight;
+            public Color Link;
+        }
+
+        // Checks whether Windows apps are set to use the dark theme
+        public static bool IsDarkTheme() {
+            try {
+                using(RegistryKey key = Registry.CurrentUser.OpenSubKey(REG_PERSONALIZE_KEY))
+                    return Convert.ToInt32(key.GetValue(REG_APPS_USE_LIGHT_THEME, 1)) == 0;
+            } catch {
+                return false;
+            }
+        }
+
+        // Retrieves colors for the current GUI theme
+        public static ThemeColors GetThemeColors() {
+            if(IsDarkTheme())
+                return new ThemeColors {
+                    IsDark = true,
+                    FormBack = Color.FromArgb(32, 32, 32),
+                    ControlBack = Color.FromArgb(48, 48, 48),
+                    InputBack = Color.FromArgb(42, 42, 42),
+                    Text = Color.FromArgb(242, 242, 242),
+                    MutedText = Color.FromArgb(170, 170, 170),
+                    Border = Color.FromArgb(72, 72, 72),
+                    Highlight = Color.FromArgb(58, 150, 221),
+                    Link = Color.FromArgb(87, 166, 255)
+                };
+
+            return new ThemeColors {
+                IsDark = false,
+                FormBack = SystemColors.Control,
+                ControlBack = SystemColors.Control,
+                InputBack = SystemColors.Window,
+                Text = SystemColors.ControlText,
+                MutedText = SystemColors.GrayText,
+                Border = SystemColors.ControlDark,
+                Highlight = SystemColors.Highlight,
+                Link = Color.Empty
+            };
+        }
+
+        // Applies the current theme to a form
+        public static void ApplyTheme(Form form) {
+            if(form == null)
+                return;
+
+            ThemeColors theme = GetThemeColors();
+
+            form.HandleCreated += delegate {
+                ApplyTitleBarTheme(form);
+            };
+
+            if(form.IsHandleCreated)
+                ApplyTitleBarTheme(form);
+
+            if(!theme.IsDark)
+                return;
+
+            form.BackColor = theme.FormBack;
+            form.ForeColor = theme.Text;
+            ApplyTheme(form.Controls, theme);
+        }
+
+        // Applies the current theme to a context menu
+        public static void ApplyTheme(ToolStrip toolStrip) {
+            if(toolStrip == null)
+                return;
+
+            ThemeColors theme = GetThemeColors();
+            if(!theme.IsDark)
+                return;
+
+            ApplyTheme(toolStrip, theme);
+        }
+
+        // Applies theme colors to a menu strip
+        private static void ApplyTheme(ToolStrip toolStrip, ThemeColors theme) {
+            if(toolStrip == null)
+                return;
+
+            toolStrip.BackColor = GetMenuBack(theme);
+            toolStrip.ForeColor = theme.Text;
+            ApplyTheme(toolStrip.Items, theme);
+        }
+
+        // Applies the native title bar theme to a form
+        public static void ApplyTitleBarTheme(Form form) {
+            if(form == null || !form.IsHandleCreated)
+                return;
+
+            int enabled = IsDarkTheme() ? 1 : 0;
+
+            try {
+                if(Dwm.DwmSetWindowAttribute(
+                    form.Handle,
+                    Dwm.DWMWA_USE_IMMERSIVE_DARK_MODE,
+                    ref enabled,
+                    Marshal.SizeOf(typeof(int))) == 0)
+                    return;
+
+                enabled = IsDarkTheme() ? 1 : 0;
+                Dwm.DwmSetWindowAttribute(
+                    form.Handle,
+                    Dwm.DWMWA_USE_IMMERSIVE_DARK_MODE_LEGACY,
+                    ref enabled,
+                    Marshal.SizeOf(typeof(int)));
+            } catch { }
+        }
+
+        // Applies theme colors to known control types
+        private static void ApplyTheme(Control.ControlCollection controls, ThemeColors theme) {
+            foreach(Control control in controls) {
+                ApplyTheme(control, theme);
+
+                if(control.Controls.Count > 0)
+                    ApplyTheme(control.Controls, theme);
+            }
+        }
+
+        // Applies theme colors to a known control type
+        private static void ApplyTheme(Control control, ThemeColors theme) {
+            if(control is Button button) {
+                button.UseVisualStyleBackColor = false;
+                button.BackColor = theme.ControlBack;
+                button.ForeColor = theme.Text;
+            } else if(control is CheckBox checkBox) {
+                checkBox.UseVisualStyleBackColor = false;
+                checkBox.BackColor = theme.FormBack;
+                checkBox.ForeColor = theme.Text;
+            } else if(control is RadioButton radioButton) {
+                radioButton.UseVisualStyleBackColor = false;
+                radioButton.BackColor = theme.FormBack;
+                radioButton.ForeColor = theme.Text;
+            } else if(control is ComboBox comboBox) {
+                comboBox.BackColor = theme.InputBack;
+                comboBox.ForeColor = theme.Text;
+            } else if(control is TextBox textBox) {
+                textBox.BackColor = theme.InputBack;
+                textBox.ForeColor = theme.Text;
+            } else if(control is RichTextBox richTextBox) {
+                richTextBox.Enabled = true;
+                richTextBox.BackColor = theme.FormBack;
+                richTextBox.ForeColor = theme.Text;
+            } else if(control is LinkLabel linkLabel) {
+                linkLabel.BackColor = theme.FormBack;
+                linkLabel.ForeColor = theme.Text;
+                linkLabel.LinkColor = theme.Link;
+                linkLabel.ActiveLinkColor = theme.Highlight;
+                linkLabel.VisitedLinkColor = theme.Link;
+            } else if(control is Label label) {
+                label.BackColor = theme.FormBack;
+                label.ForeColor = theme.Text;
+            } else if(control is GroupBox groupBox) {
+                groupBox.BackColor = theme.FormBack;
+                groupBox.ForeColor = theme.Text;
+            } else if(control is TableLayoutPanel tableLayoutPanel) {
+                tableLayoutPanel.BackColor = theme.FormBack;
+                tableLayoutPanel.ForeColor = theme.Text;
+            } else if(control is TrackBar trackBar) {
+                trackBar.BackColor = theme.FormBack;
+                trackBar.ForeColor = theme.Text;
+            } else if(control is PictureBox pictureBox) {
+                pictureBox.BackColor = theme.FormBack;
+            }
+        }
+
+        // Applies theme colors to menu items
+        private static void ApplyTheme(ToolStripItemCollection items, ThemeColors theme) {
+            foreach(ToolStripItem item in items) {
+                item.BackColor = GetMenuBack(theme);
+                item.ForeColor = item.Enabled ? theme.Text : theme.MutedText;
+
+                if(item is ToolStripMenuItem menuItem && menuItem.DropDown != null)
+                    ApplyTheme(menuItem.DropDown, theme);
+            }
+        }
+
+        // Retrieves the menu background color
+        private static Color GetMenuBack(ThemeColors theme) {
+            return Color.FromArgb(45, 45, 48);
         }
 #endregion
 
@@ -320,6 +520,7 @@ namespace OmenMon.AppGui {
             FormInputText.SizeGripStyle = SizeGripStyle.Hide;
             FormInputText.StartPosition = FormStartPosition.CenterParent;
             FormInputText.Text = title;
+            ApplyTheme(FormInputText);
 
             // Tool tips
             Tip.SetToolTip(TxtInput, Config.Locale.Get(Config.L_GUI_TIP + T_TXT + "Input"));
