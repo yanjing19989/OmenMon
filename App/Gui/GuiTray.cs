@@ -117,6 +117,7 @@ namespace OmenMon.AppGui {
 
             // Register the power-mode change event handler
             SystemEvents.PowerModeChanged += EventPowerChange;
+            SystemEvents.UserPreferenceChanged += EventUserPreferenceChanged;
 
         }
 
@@ -145,6 +146,7 @@ namespace OmenMon.AppGui {
 
             // Unregister the power-mode change event handler
             SystemEvents.PowerModeChanged -= EventPowerChange;
+            SystemEvents.UserPreferenceChanged -= EventUserPreferenceChanged;
 
             // Stop receiving power event notifications
             Gui.UnregisterSuspendResumeNotification();
@@ -180,6 +182,14 @@ namespace OmenMon.AppGui {
 
         }
 
+        // Handles Windows user preference changes
+        private void EventUserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e) {
+            if(e.Category == UserPreferenceCategory.Color
+                || e.Category == UserPreferenceCategory.General
+                || e.Category == UserPreferenceCategory.VisualStyle)
+                ApplyTheme();
+        }
+
         // Handles a timer tick
         private void EventTimerTick(object sender, EventArgs e) {
 
@@ -190,6 +200,18 @@ namespace OmenMon.AppGui {
 #endregion
 
 #region Visual Methods
+        // Applies the current theme to open GUI surfaces
+        public void ApplyTheme() {
+            Gui.RefreshTheme();
+
+            if(this.Notification == null || this.Notification.ContextMenuStrip == null)
+                return;
+
+            this.Notification.ContextMenuStrip.Renderer = new GuiMenuCustomRenderer();
+            Gui.ApplyTheme(this.Notification.ContextMenuStrip);
+            this.Notification.ContextMenuStrip.Invalidate();
+        }
+
         // Brings the already-running application instance to the user's attention
         public void BringFocus() {
 

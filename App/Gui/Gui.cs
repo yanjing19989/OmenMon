@@ -3,6 +3,7 @@
      //  https://omenmon.github.io/
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -44,6 +45,9 @@ namespace OmenMon.AppGui {
         private const string REG_PERSONALIZE_KEY =
             "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize";
         private const string REG_APPS_USE_LIGHT_THEME = "AppsUseLightTheme";
+
+        // Forms already wired for handle-created title bar theme updates
+        private static HashSet<Form> ThemeForms = new HashSet<Form>();
 
         // Message box flags
         public const int MB_SYSTEMMODAL = 0x00001000;  // On top of other topmost windows
@@ -172,7 +176,7 @@ namespace OmenMon.AppGui {
                 MutedText = SystemColors.GrayText,
                 Border = SystemColors.ControlDark,
                 Highlight = SystemColors.Highlight,
-                Link = Color.Empty
+                Link = SystemColors.HotTrack
             };
         }
 
@@ -183,15 +187,14 @@ namespace OmenMon.AppGui {
 
             ThemeColors theme = GetThemeColors();
 
-            form.HandleCreated += delegate {
-                ApplyTitleBarTheme(form);
-            };
+            if(!ThemeForms.Contains(form)) {
+                ThemeForms.Add(form);
+                form.HandleCreated += EventThemeFormHandleCreated;
+                form.FormClosed += EventThemeFormClosed;
+            }
 
             if(form.IsHandleCreated)
                 ApplyTitleBarTheme(form);
-
-            if(!theme.IsDark)
-                return;
 
             form.BackColor = theme.FormBack;
             form.ForeColor = theme.Text;
@@ -204,10 +207,23 @@ namespace OmenMon.AppGui {
                 return;
 
             ThemeColors theme = GetThemeColors();
-            if(!theme.IsDark)
-                return;
-
             ApplyTheme(toolStrip, theme);
+        }
+
+        // Refreshes the current theme on open forms
+        public static void RefreshTheme() {
+            List<Form> forms = new List<Form>();
+
+            foreach(Form form in Application.OpenForms)
+                forms.Add(form);
+
+            foreach(Form form in forms)
+                if(form is GuiFormMain)
+                    ((GuiFormMain) form).ApplyTheme();
+                else if(form is GuiFormAbout)
+                    ((GuiFormAbout) form).ApplyTheme();
+                else
+                    ApplyTheme(form);
         }
 
         // Applies theme colors to a menu strip
@@ -257,15 +273,15 @@ namespace OmenMon.AppGui {
         // Applies theme colors to a known control type
         private static void ApplyTheme(Control control, ThemeColors theme) {
             if(control is Button button) {
-                button.UseVisualStyleBackColor = false;
+                button.UseVisualStyleBackColor = !theme.IsDark;
                 button.BackColor = theme.ControlBack;
                 button.ForeColor = theme.Text;
             } else if(control is CheckBox checkBox) {
-                checkBox.UseVisualStyleBackColor = false;
+                checkBox.UseVisualStyleBackColor = !theme.IsDark;
                 checkBox.BackColor = theme.FormBack;
                 checkBox.ForeColor = theme.Text;
             } else if(control is RadioButton radioButton) {
-                radioButton.UseVisualStyleBackColor = false;
+                radioButton.UseVisualStyleBackColor = !theme.IsDark;
                 radioButton.BackColor = theme.FormBack;
                 radioButton.ForeColor = theme.Text;
             } else if(control is ComboBox comboBox) {
@@ -275,7 +291,7 @@ namespace OmenMon.AppGui {
                 textBox.BackColor = theme.InputBack;
                 textBox.ForeColor = theme.Text;
             } else if(control is RichTextBox richTextBox) {
-                richTextBox.Enabled = true;
+                richTextBox.Enabled = theme.IsDark;
                 richTextBox.BackColor = theme.FormBack;
                 richTextBox.ForeColor = theme.Text;
             } else if(control is LinkLabel linkLabel) {
@@ -314,7 +330,23 @@ namespace OmenMon.AppGui {
 
         // Retrieves the menu background color
         private static Color GetMenuBack(ThemeColors theme) {
-            return Color.FromArgb(45, 45, 48);
+            return theme.IsDark ? Color.FromArgb(45, 45, 48) : SystemColors.Menu;
+        }
+
+        // Applies title bar theme whenever a themed form handle is recreated
+        private static void EventThemeFormHandleCreated(object sender, EventArgs e) {
+            ApplyTitleBarTheme(sender as Form);
+        }
+
+        // Removes closed forms from the themed form registry
+        private static void EventThemeFormClosed(object sender, FormClosedEventArgs e) {
+            Form form = sender as Form;
+            if(form == null)
+                return;
+
+            form.HandleCreated -= EventThemeFormHandleCreated;
+            form.FormClosed -= EventThemeFormClosed;
+            ThemeForms.Remove(form);
         }
 #endregion
 

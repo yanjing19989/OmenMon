@@ -657,6 +657,14 @@ namespace OmenMon.AppGui {
 
         }
 
+        // Applies the current theme and refreshes theme-dependent text
+        public void ApplyTheme() {
+            Gui.ApplyTheme(this);
+            UpdateSysRtf();
+            UpdateTmp();
+            this.Invalidate(true);
+        }
+
         // Updates the form dimensions following a scaling change
         private void UpdateDpi(int dpi) {
 

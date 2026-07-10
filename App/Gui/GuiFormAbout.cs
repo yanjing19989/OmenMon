@@ -28,19 +28,23 @@ namespace OmenMon.AppGui {
         // Stores the component container
         private System.ComponentModel.IContainer Components;
 
+        // Stores the rich text source for theme refreshes
+        private bool IsDefaultText;
+        private string InfoText;
+
 #region Construction & Disposal
         // Constructs the form
         public GuiFormAbout(string title = "", string text = "") {
 
             // Initialize the component model container
             this.Components = new System.ComponentModel.Container();
+            this.IsDefaultText = text == "";
+            this.InfoText = this.IsDefaultText ? Config.Locale.Get(Config.L_GUI_ABOUT + "Text") : text;
 
             // Initialize the form components
             Initialize();
-            Gui.ApplyTheme(this);
+            ApplyTheme();
 
-            this.RtfAppInfo.Rtf = Conv.GetUnicodeStringRtf(text != "" ? text : Config.Locale.Get(Config.L_GUI_ABOUT + "Text"));
-            ApplyRtfTheme(text == "");
             this.Text = title != "" ? title : Config.Locale.Get(Config.L_GUI_ABOUT + "Title");
 
         }
@@ -228,10 +232,18 @@ namespace OmenMon.AppGui {
 #endregion
 
 #region Event Handlers
+        // Applies the current theme and refreshes rich-text colors
+        public void ApplyTheme() {
+            Gui.ApplyTheme(this);
+            this.RtfAppInfo.Rtf = Conv.GetUnicodeStringRtf(this.InfoText);
+            ApplyRtfTheme();
+            this.Invalidate(true);
+        }
+
         // Applies dark theme colors to default RTF text without changing error colors
-        private void ApplyRtfTheme(bool isDefaultText) {
+        private void ApplyRtfTheme() {
             Gui.ThemeColors theme = Gui.GetThemeColors();
-            if(!theme.IsDark || !isDefaultText)
+            if(!theme.IsDark || !this.IsDefaultText)
                 return;
 
             this.RtfAppInfo.SelectAll();
