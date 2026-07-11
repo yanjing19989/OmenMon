@@ -75,6 +75,7 @@
         <Compile Include="Driver\Ring0.cs"/>
         <Compile Include="External\AdvApi.cs"/>
         <Compile Include="External\ColorMgmt.cs"/>
+        <Compile Include="External\Dwm.cs"/>
         <Compile Include="External\Gdi.cs"/>
         <Compile Include="External\Kernel.cs"/>
         <Compile Include="External\PowrProf.cs"/>

@@ -463,7 +463,7 @@ namespace OmenMon.AppGui {
             this.RtfSysInfo.BorderStyle = BorderStyle.None;
             this.RtfSysInfo.Cursor = Cursors.Arrow;
             this.RtfSysInfo.DetectUrls = false;
-            // this.RtfSysInfo.Enabled = false;
+            this.RtfSysInfo.Enabled = false;
             this.RtfSysInfo.Location = new Point(6, 16);
             this.RtfSysInfo.Name = Gui.T_RTF + Gui.G_SYS + "Info";
             this.RtfSysInfo.ReadOnly = true;
@@ -493,7 +493,7 @@ namespace OmenMon.AppGui {
 
 #region Temperature Group
             // Temperature sensor #0 caption
-            this.LblTmp0Cap.Location = new Point(6, 21);
+            this.LblTmp0Cap.Location = new Point(6, 16);
             this.LblTmp0Cap.Name = Gui.T_LBL + Gui.G_TMP + "0" + Gui.S_CAP;
             this.LblTmp0Cap.Size = new Size(44, 14);
             this.LblTmp0Cap.TabIndex = 0;
@@ -501,14 +501,14 @@ namespace OmenMon.AppGui {
 
             // Temperature sensor #0 value [°C]
             this.LblTmp0Val.Font = this.FigureFont;
-            this.LblTmp0Val.Location = new Point(6, 35);
+            this.LblTmp0Val.Location = new Point(6, 30);
             this.LblTmp0Val.Name = Gui.T_LBL + Gui.G_TMP + "0" + Gui.S_VAL;
             this.LblTmp0Val.Size = new Size(44, 27);
             this.LblTmp0Val.TabIndex = 1;
             this.LblTmp0Val.TextAlign = ContentAlignment.MiddleCenter;
 
             // Temperature sensor #1 caption
-            this.LblTmp1Cap.Location = new Point(50, 21);
+            this.LblTmp1Cap.Location = new Point(50, 16);
             this.LblTmp1Cap.Name = Gui.T_LBL + Gui.G_TMP + "1" + Gui.S_CAP;
             this.LblTmp1Cap.Size = new Size(44, 14);
             this.LblTmp1Cap.TabIndex = 2;
@@ -516,14 +516,14 @@ namespace OmenMon.AppGui {
 
             // Temperature sensor #1 value [°C]
             this.LblTmp1Val.Font = this.FigureFont;
-            this.LblTmp1Val.Location = new Point(50, 35);
+            this.LblTmp1Val.Location = new Point(50, 30);
             this.LblTmp1Val.Name = Gui.T_LBL + Gui.G_TMP + "1" + Gui.S_VAL;
             this.LblTmp1Val.Size = new Size(44, 27);
             this.LblTmp1Val.TabIndex = 3;
             this.LblTmp1Val.TextAlign = ContentAlignment.MiddleCenter;
 
             // Temperature sensor #2 caption
-            this.LblTmp2Cap.Location = new Point(94, 21);
+            this.LblTmp2Cap.Location = new Point(94, 16);
             this.LblTmp2Cap.Name = Gui.T_LBL + Gui.G_TMP + "2" + Gui.S_CAP;
             this.LblTmp2Cap.Size = new Size(44, 14);
             this.LblTmp2Cap.TabIndex = 4;
@@ -531,14 +531,14 @@ namespace OmenMon.AppGui {
 
             // Temperature sensor #2 value [°C]
             this.LblTmp2Val.Font = this.FigureFont;
-            this.LblTmp2Val.Location = new Point(94, 35);
+            this.LblTmp2Val.Location = new Point(94, 30);
             this.LblTmp2Val.Name = Gui.T_LBL + Gui.G_TMP + "2" + Gui.S_VAL;
             this.LblTmp2Val.Size = new Size(44, 27);
             this.LblTmp2Val.TabIndex = 5;
             this.LblTmp2Val.TextAlign = ContentAlignment.MiddleCenter;
 
             // Temperature sensor #3 caption
-            this.LblTmp3Cap.Location = new Point(138, 21);
+            this.LblTmp3Cap.Location = new Point(138, 16);
             this.LblTmp3Cap.Name = Gui.T_LBL + Gui.G_TMP + "3" + Gui.S_CAP;
             this.LblTmp3Cap.Size = new Size(44, 14);
             this.LblTmp3Cap.TabIndex = 6;
@@ -546,14 +546,14 @@ namespace OmenMon.AppGui {
 
             // Temperature sensor #3 value [°C]
             this.LblTmp3Val.Font = this.FigureFont;
-            this.LblTmp3Val.Location = new Point(138, 35);
+            this.LblTmp3Val.Location = new Point(138, 30);
             this.LblTmp3Val.Name = Gui.T_LBL + Gui.G_TMP + "3" + Gui.S_VAL;
             this.LblTmp3Val.Size = new Size(44, 27);
             this.LblTmp3Val.TabIndex = 7;
             this.LblTmp3Val.TextAlign = ContentAlignment.MiddleCenter;
 
             // Temperature sensor #4 caption
-            this.LblTmp4Cap.Location = new Point(182, 21);
+            this.LblTmp4Cap.Location = new Point(182, 16);
             this.LblTmp4Cap.Name = Gui.T_LBL + Gui.G_TMP + "4" + Gui.S_CAP;
             this.LblTmp4Cap.Size = new Size(44, 14);
             this.LblTmp4Cap.TabIndex = 8;
@@ -561,14 +561,14 @@ namespace OmenMon.AppGui {
 
             // Temperature sensor #4 value [°C]
             this.LblTmp4Val.Font = this.FigureFont;
-            this.LblTmp4Val.Location = new Point(182, 35);
+            this.LblTmp4Val.Location = new Point(182, 30);
             this.LblTmp4Val.Name = Gui.T_LBL + Gui.G_TMP + "4" + Gui.S_VAL;
             this.LblTmp4Val.Size = new Size(44, 27);
             this.LblTmp4Val.TabIndex = 9;
             this.LblTmp4Val.TextAlign = ContentAlignment.MiddleCenter;
 
             // Temperature sensor #5 caption
-            this.LblTmp5Cap.Location = new Point(226, 21);
+            this.LblTmp5Cap.Location = new Point(226, 16);
             this.LblTmp5Cap.Name = Gui.T_LBL + Gui.G_TMP + "5" + Gui.S_CAP;
             this.LblTmp5Cap.Size = new Size(44, 14);
             this.LblTmp5Cap.TabIndex = 10;
@@ -576,14 +576,14 @@ namespace OmenMon.AppGui {
 
             // Temperature sensor #5 value [°C]
             this.LblTmp5Val.Font = this.FigureFont;
-            this.LblTmp5Val.Location = new Point(226, 35);
+            this.LblTmp5Val.Location = new Point(226, 30);
             this.LblTmp5Val.Name = Gui.T_LBL + Gui.G_TMP + "5" + Gui.S_VAL;
             this.LblTmp5Val.Size = new Size(44, 27);
             this.LblTmp5Val.TabIndex = 11;
             this.LblTmp5Val.TextAlign = ContentAlignment.MiddleCenter;
 
             // Temperature sensor #6 caption
-            this.LblTmp6Cap.Location = new Point(270, 21);
+            this.LblTmp6Cap.Location = new Point(270, 16);
             this.LblTmp6Cap.Name = Gui.T_LBL + Gui.G_TMP + "6" + Gui.S_CAP;
             this.LblTmp6Cap.Size = new Size(44, 14);
             this.LblTmp6Cap.TabIndex = 12;
@@ -591,14 +591,14 @@ namespace OmenMon.AppGui {
 
             // Temperature sensor #6 value [°C]
             this.LblTmp6Val.Font = this.FigureFont;
-            this.LblTmp6Val.Location = new Point(270, 35);
+            this.LblTmp6Val.Location = new Point(270, 30);
             this.LblTmp6Val.Name = Gui.T_LBL + Gui.G_TMP + "6" + Gui.S_VAL;
             this.LblTmp6Val.Size = new Size(44, 27);
             this.LblTmp6Val.TabIndex = 13;
             this.LblTmp6Val.TextAlign = ContentAlignment.MiddleCenter;
 
             // Temperature sensor #7 caption
-            this.LblTmp7Cap.Location = new Point(314, 21);
+            this.LblTmp7Cap.Location = new Point(314, 16);
             this.LblTmp7Cap.Name = Gui.T_LBL + Gui.G_TMP + "7" + Gui.S_CAP;
             this.LblTmp7Cap.Size = new Size(44, 14);
             this.LblTmp7Cap.TabIndex = 14;
@@ -606,14 +606,14 @@ namespace OmenMon.AppGui {
 
             // Temperature sensor #7 value [°C]
             this.LblTmp7Val.Font = this.FigureFont;
-            this.LblTmp7Val.Location = new Point(314, 35);
+            this.LblTmp7Val.Location = new Point(314, 30);
             this.LblTmp7Val.Name = Gui.T_LBL + Gui.G_TMP + "7" + Gui.S_VAL;
             this.LblTmp7Val.Size = new Size(44, 27);
             this.LblTmp7Val.TabIndex = 15;
             this.LblTmp7Val.TextAlign = ContentAlignment.MiddleCenter;
 
             // Temperature sensor #8 caption
-            this.LblTmp8Cap.Location = new Point(358, 21);
+            this.LblTmp8Cap.Location = new Point(358, 16);
             this.LblTmp8Cap.Name = Gui.T_LBL + Gui.G_TMP + "8" + Gui.S_CAP;
             this.LblTmp8Cap.Size = new Size(44, 14);
             this.LblTmp8Cap.TabIndex = 16;
@@ -621,7 +621,7 @@ namespace OmenMon.AppGui {
 
             // Temperature sensor #8 value [°C]
             this.LblTmp8Val.Font = this.FigureFont;
-            this.LblTmp8Val.Location = new Point(358, 35);
+            this.LblTmp8Val.Location = new Point(358, 30);
             this.LblTmp8Val.Name = Gui.T_LBL + Gui.G_TMP + "8" + Gui.S_VAL;
             this.LblTmp8Val.Size = new Size(44, 27);
             this.LblTmp8Val.TabIndex = 17;
@@ -678,10 +678,6 @@ namespace OmenMon.AppGui {
             this.SizeGripStyle = SizeGripStyle.Hide;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Text = Config.Locale.Get(Config.L_GUI_MAIN + "Title");
-            this.FormBorderStyle = FormBorderStyle.None;
-            
-            // 确保鼠标事件能够在窗体的任何位置触发
-            this.Cursor = Cursors.Default;
 #endregion
 
 #region Tool Tips

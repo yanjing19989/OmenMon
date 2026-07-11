@@ -28,18 +28,23 @@ namespace OmenMon.AppGui {
         // Stores the component container
         private System.ComponentModel.IContainer Components;
 
+        // Stores the rich text source for theme refreshes
+        private bool IsDefaultText;
+        private string InfoText;
+
 #region Construction & Disposal
         // Constructs the form
         public GuiFormAbout(string title = "", string text = "") {
 
             // Initialize the component model container
             this.Components = new System.ComponentModel.Container();
+            this.IsDefaultText = text == "";
+            this.InfoText = this.IsDefaultText ? Config.Locale.Get(Config.L_GUI_ABOUT + "Text") : text;
 
             // Initialize the form components
             Initialize();
-            Gui.ApplyDarkModeToForm(this); // 应用暗黑模式
+            ApplyTheme();
 
-            this.RtfAppInfo.Rtf = Conv.GetUnicodeStringRtf(text != "" ? text : Config.Locale.Get(Config.L_GUI_ABOUT + "Text"));
             this.Text = title != "" ? title : Config.Locale.Get(Config.L_GUI_ABOUT + "Title");
 
         }
@@ -101,7 +106,7 @@ namespace OmenMon.AppGui {
             this.TblLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 164F));
             this.TblLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 14F));
             this.TblLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 14F));
-            this.TblLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F));
+            this.TblLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 50F));
             this.TblLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 27F));
             this.TblLayout.Size = new Size(372, 269);
             this.TblLayout.TabIndex = 1;
@@ -149,13 +154,13 @@ namespace OmenMon.AppGui {
             this.TblLayout.SetColumnSpan(this.RtfAppInfo, 2);
             this.RtfAppInfo.DetectUrls = false;
             this.RtfAppInfo.Dock = DockStyle.Fill;
-            // this.RtfAppInfo.Enabled = false;
+            this.RtfAppInfo.Enabled = false;
             this.RtfAppInfo.Location = new Point(30, 195);
             this.RtfAppInfo.Margin = new Padding(30, 3, 30, 3);
             this.RtfAppInfo.Name = Gui.T_RTF + "AppInfo";
             this.RtfAppInfo.ReadOnly = true;
             this.RtfAppInfo.ScrollBars = RichTextBoxScrollBars.None;
-            this.RtfAppInfo.Size = new Size(312, 55);
+            this.RtfAppInfo.Size = new Size(312, 44);
             this.RtfAppInfo.TabIndex = 5;
             this.RtfAppInfo.TabStop = false;
 
@@ -168,8 +173,6 @@ namespace OmenMon.AppGui {
             this.LnkAppLink.TabIndex = 6;
             this.LnkAppLink.TabStop = false;
             this.LnkAppLink.TextAlign = ContentAlignment.MiddleRight;
-            this.LnkAppLink.LinkColor = Color.FromArgb(58, 150, 221);
-            this.LnkAppLink.ActiveLinkColor = Color.FromArgb(0, 200, 255);
 
             // Button to close the dialog
             this.BtnAccept.Anchor = ((AnchorStyles) (AnchorStyles.Bottom | AnchorStyles.Right));
@@ -194,7 +197,7 @@ namespace OmenMon.AppGui {
             this.AcceptButton = this.BtnAccept;
             this.AutoScaleDimensions = new SizeF(6F, 13F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.ClientSize = new Size(384, 292);
+            this.ClientSize = new Size(384, 281);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -202,7 +205,6 @@ namespace OmenMon.AppGui {
             this.Padding = new Padding(6);
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
-            this.FormBorderStyle = FormBorderStyle.None;
             this.StartPosition = FormStartPosition.CenterScreen;
 #endregion
 
@@ -230,6 +232,26 @@ namespace OmenMon.AppGui {
 #endregion
 
 #region Event Handlers
+        // Applies the current theme and refreshes rich-text colors
+        public void ApplyTheme() {
+            Gui.ApplyTheme(this);
+            this.RtfAppInfo.Rtf = Conv.GetUnicodeStringRtf(this.InfoText);
+            ApplyRtfTheme();
+            this.Invalidate(true);
+        }
+
+        // Applies dark theme colors to default RTF text without changing error colors
+        private void ApplyRtfTheme() {
+            Gui.ThemeColors theme = Gui.GetThemeColors();
+            if(!theme.IsDark || !this.IsDefaultText)
+                return;
+
+            this.RtfAppInfo.SelectAll();
+            this.RtfAppInfo.SelectionColor = theme.Text;
+            this.RtfAppInfo.SelectionBackColor = theme.FormBack;
+            this.RtfAppInfo.DeselectAll();
+        }
+
         // Handles a click on the only button
         private void EventActionClose(object sender, EventArgs e) {
             this.Close();

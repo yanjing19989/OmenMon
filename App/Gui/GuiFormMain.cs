@@ -1,4 +1,4 @@
-//\\   OmenMon: Hardware Monitoring & Control Utility
+  //\\   OmenMon: Hardware Monitoring & Control Utility
  //  \\  Copyright © 2023-2024 Piotr Szczepański * License: GPL3
      //  https://omenmon.github.io/
 
@@ -48,10 +48,6 @@ namespace OmenMon.AppGui {
 
         // Stores the component container
         private System.ComponentModel.IContainer Components;
-        
-        // 用于窗口拖动的变量
-        private bool isDragging = false;
-        private Point dragStartPoint;
 #endregion Variables
 
 #region Construction & Disposal
@@ -71,7 +67,7 @@ namespace OmenMon.AppGui {
 
             // Initialize the form components
             Initialize();
-            Gui.ApplyDarkModeToForm(this);
+            Gui.ApplyTheme(this);
 
             // Pre-populate the last DPI setting to the value at launch
             this.LastDpi = (int) Gui.GetDeviceContextDpi(IntPtr.Zero);
@@ -111,11 +107,7 @@ namespace OmenMon.AppGui {
                 Conv.RTF_CF6 + Config.AppName + " "
                 + Conv.RTF_CF5 + Config.AppVersion + " "
                 + Conv.RTF_CF2 + Config.Locale.Get(Config.L_GUI_MAIN + Gui.G_SYS + "MsgWelcome"));
-                
-            // 添加鼠标事件处理器
-            this.MouseDown += EventFormMouseDown;
-            this.MouseMove += EventFormMouseMove;
-            this.MouseUp += EventFormMouseUp;
+
         }
 
         // Handles component disposal
@@ -164,39 +156,6 @@ namespace OmenMon.AppGui {
             // Run the base procedure
             base.WndProc(ref m);
 
-        }
-#endregion
-
-#region Window Dragging
-        // 处理鼠标按下事件，开始拖拽
-        private void EventFormMouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                isDragging = true;
-                dragStartPoint = new Point(e.X, e.Y);
-            }
-        }
-
-        // 处理鼠标移动事件，移动窗口
-        private void EventFormMouseMove(object sender, MouseEventArgs e)
-        {
-            if (isDragging)
-            {
-                Point currentPoint = PointToScreen(new Point(e.X, e.Y));
-                Location = new Point(
-                    currentPoint.X - dragStartPoint.X,
-                    currentPoint.Y - dragStartPoint.Y);
-            }
-        }
-
-        // 处理鼠标释放事件，结束拖拽
-        private void EventFormMouseUp(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                isDragging = false;
-            }
         }
 #endregion
 
@@ -440,7 +399,7 @@ namespace OmenMon.AppGui {
         private void EventColorInput(object sender, EventArgs e) {
             try {
                 Kbd.SetColors(new BiosData.ColorTable(this.TxtKbdColorVal.Text));
-                this.TxtKbdColorVal.ForeColor = Color.Empty;
+                this.TxtKbdColorVal.ForeColor = Gui.GetThemeColors().Text;
             } catch {
                 this.TxtKbdColorVal.ForeColor = Color.Red;
             }
@@ -698,6 +657,14 @@ namespace OmenMon.AppGui {
 
         }
 
+        // Applies the current theme and refreshes theme-dependent text
+        public void ApplyTheme() {
+            Gui.ApplyTheme(this);
+            UpdateSysRtf();
+            UpdateTmp();
+            this.Invalidate(true);
+        }
+
         // Updates the form dimensions following a scaling change
         private void UpdateDpi(int dpi) {
 
@@ -821,7 +788,7 @@ namespace OmenMon.AppGui {
         public void UpdateKbd() {
 
             // Restore the default color of the color as parameter text box
-            this.TxtKbdColorVal.ForeColor = Color.Empty;
+            this.TxtKbdColorVal.ForeColor = Gui.GetThemeColors().Text;
 
             // Disable the backlight toggle for unsupported devices,
             // otherwise update the keyboard backlight status
@@ -937,7 +904,7 @@ namespace OmenMon.AppGui {
         // Update the system status rich-text field
         private void UpdateSysRtf() {
             this.RtfSysInfo.Rtf =
-                Config.SysInfoRtfHeader
+                Config.GetSysInfoRtfHeader(Gui.GetThemeColors().Text.ToArgb())
                 + Conv.GetUnicodeStringRtf(this.SysInfo)
                 + Conv.GetUnicodeStringRtf(this.SysStatus)
                 + Config.SysInfoRtfFooter;
@@ -968,7 +935,12 @@ namespace OmenMon.AppGui {
             Label labelValue = ((Label) this.GrpTmp.Controls[this.GrpTmp.Controls.IndexOf(labelCaption) + 1]);
 
             // Update the status
-            labelCaption.Enabled = value > 0;
+            if(Gui.GetThemeColors().IsDark) {
+                labelCaption.Enabled = true;
+                labelCaption.ForeColor = value > 0 ?
+                    Gui.GetThemeColors().Text : Gui.GetThemeColors().MutedText;
+            } else
+                labelCaption.Enabled = value > 0;
 
             // Update the value
             labelValue.Text = value == 0 ? "" :
