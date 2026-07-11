@@ -1,4 +1,4 @@
-  //\\   OmenMon: Hardware Monitoring & Control Utility
+//\\   OmenMon: Hardware Monitoring & Control Utility
  //  \\  Copyright © 2023-2024 Piotr Szczepański * License: GPL3
      //  https://omenmon.github.io/
 
@@ -48,6 +48,10 @@ namespace OmenMon.AppGui {
 
         // Stores the component container
         private System.ComponentModel.IContainer Components;
+        
+        // 用于窗口拖动的变量
+        private bool isDragging = false;
+        private Point dragStartPoint;
 #endregion Variables
 
 #region Construction & Disposal
@@ -107,7 +111,11 @@ namespace OmenMon.AppGui {
                 Conv.RTF_CF6 + Config.AppName + " "
                 + Conv.RTF_CF5 + Config.AppVersion + " "
                 + Conv.RTF_CF2 + Config.Locale.Get(Config.L_GUI_MAIN + Gui.G_SYS + "MsgWelcome"));
-
+                
+            // 添加鼠标事件处理器
+            this.MouseDown += EventFormMouseDown;
+            this.MouseMove += EventFormMouseMove;
+            this.MouseUp += EventFormMouseUp;
         }
 
         // Handles component disposal
@@ -156,6 +164,39 @@ namespace OmenMon.AppGui {
             // Run the base procedure
             base.WndProc(ref m);
 
+        }
+#endregion
+
+#region Window Dragging
+        // 处理鼠标按下事件，开始拖拽
+        private void EventFormMouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                isDragging = true;
+                dragStartPoint = new Point(e.X, e.Y);
+            }
+        }
+
+        // 处理鼠标移动事件，移动窗口
+        private void EventFormMouseMove(object sender, MouseEventArgs e)
+        {
+            if (isDragging)
+            {
+                Point currentPoint = PointToScreen(new Point(e.X, e.Y));
+                Location = new Point(
+                    currentPoint.X - dragStartPoint.X,
+                    currentPoint.Y - dragStartPoint.Y);
+            }
+        }
+
+        // 处理鼠标释放事件，结束拖拽
+        private void EventFormMouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                isDragging = false;
+            }
         }
 #endregion
 

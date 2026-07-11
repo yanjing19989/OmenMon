@@ -119,6 +119,91 @@ namespace OmenMon.AppGui {
 
         }
 
+        /// 为指定窗体应用暗黑模式
+        public static void ApplyDarkModeToForm(Form form) {
+            if (form == null) return;
+            
+            // 设置窗体基础颜色
+            form.BackColor = Color.FromArgb(30, 30, 30);
+            form.ForeColor = Color.White;
+            
+            // 递归设置窗体上的所有控件
+            ApplyDarkModeToControls(form.Controls);
+        }
+
+        /// 递归为控件集合应用暗黑模式
+        public static void ApplyDarkModeToControls(Control.ControlCollection controls) {
+            foreach (Control control in controls) {
+                // 特定控件类型的处理
+                if (control is Button button) {
+                    button.BackColor = Color.FromArgb(50, 50, 50);
+                    button.ForeColor = Color.White;
+                    button.FlatAppearance.BorderColor = Color.FromArgb(58, 150, 221);
+                }
+                else if (control is Label label) {
+                    label.BackColor = Color.FromArgb(30, 30, 30);
+                    label.ForeColor = Color.White;
+                }
+                else if (control is ListView listView) {
+                    listView.BackColor = Color.FromArgb(30, 30, 30);
+                    listView.ForeColor = Color.White;
+                }
+                else if (control is TableLayoutPanel tableLayoutPanel) {
+                    tableLayoutPanel.BackColor = Color.FromArgb(30, 30, 30);
+                    tableLayoutPanel.ForeColor = Color.White;
+                }
+                else if (control is RichTextBox richTextBox) {
+                    richTextBox.BackColor = Color.FromArgb(30, 30, 30);
+                    richTextBox.ForeColor = Color.White;
+                }
+                else if (control is LinkLabel linkLabel) {
+                    linkLabel.LinkColor = Color.FromArgb(58, 150, 221);
+                    linkLabel.VisitedLinkColor = Color.FromArgb(128, 100, 221);
+                    linkLabel.ActiveLinkColor = Color.FromArgb(0, 200, 255);
+                }
+                else if (control is ComboBox comboBox) {
+                    comboBox.BackColor = Color.FromArgb(50, 50, 50);
+                    comboBox.ForeColor = Color.White;
+                }
+                else if (control is CheckBox checkBox) {
+                    checkBox.BackColor = Color.FromArgb(30, 30, 30);
+                    checkBox.ForeColor = Color.White;
+                }
+                if (control is RadioButton radioButton) {
+                    radioButton.BackColor = Color.FromArgb(30, 30, 30);
+                    radioButton.ForeColor = Color.White;
+                } 
+                else if (control is TextBox textBox) {
+                    textBox.BackColor = Color.FromArgb(30, 30, 30);
+                    textBox.ForeColor = Color.White;
+                }
+                else if (control is GroupBox) {
+                    // 特殊处理GroupBox
+                    control.BackColor = Color.FromArgb(30, 30, 30);
+                    control.ForeColor = Color.White;
+                    control.Paint += (s, e) => {
+                        var box = s as GroupBox;
+                        DrawDarkGroupBox(box, e.Graphics);
+                    };
+                }
+
+                // 递归处理子控件
+                if (control.Controls.Count > 0) {
+                    ApplyDarkModeToControls(control.Controls);
+                }
+            }
+        }
+
+        /// 自定义绘制暗色主题的GroupBox
+        public static void DrawDarkGroupBox(GroupBox box, Graphics g) {
+            if (box == null) return;
+            
+            // 绘制标题和边框
+            using (Pen pen = new Pen(Color.FromArgb(50, 50, 50))) {
+                g.DrawRectangle(pen, 0, 0, box.Width - 1, box.Height - 1);
+            }
+        }
+
         // Closes the Windows Forms (GUI) application
         public static void Close() {
 
