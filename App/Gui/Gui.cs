@@ -186,6 +186,7 @@ namespace OmenMon.AppGui {
                 return;
 
             ThemeColors theme = GetThemeColors();
+            bool useBackdrop = false;
 
             if(!ThemeForms.Contains(form)) {
                 ThemeForms.Add(form);
@@ -193,8 +194,14 @@ namespace OmenMon.AppGui {
                 form.FormClosed += EventThemeFormClosed;
             }
 
-            if(form.IsHandleCreated)
+            if(form.IsHandleCreated) {
                 ApplyTitleBarTheme(form);
+                useBackdrop = ApplyBackdropTheme(form, theme.IsDark);
+            }
+
+            // Black pixels in an extended DWM frame reveal the backdrop material.
+            if(useBackdrop)
+                theme.FormBack = Color.Black;
 
             form.BackColor = theme.FormBack;
             form.ForeColor = theme.Text;
@@ -258,6 +265,48 @@ namespace OmenMon.AppGui {
                     ref enabled,
                     Marshal.SizeOf(typeof(int)));
             } catch { }
+        }
+
+        // Applies the Windows 11 Mica backdrop to the main window client area
+        private static bool ApplyBackdropTheme(Form form, bool enabled) {
+            if(!(form is GuiFormMain) || !form.IsHandleCreated)
+                return false;
+
+            int value = enabled ? Dwm.DWMSBT_MAINWINDOW : Dwm.DWMSBT_NONE;
+            bool applied = false;
+
+            try {
+                applied = Dwm.DwmSetWindowAttribute(
+                    form.Handle,
+                    Dwm.DWMWA_SYSTEMBACKDROP_TYPE,
+                    ref value,
+                    Marshal.SizeOf(typeof(int))) == 0;
+
+                // Windows 11 21H2 used the earlier Mica attribute.
+                if(enabled && !applied) {
+                    value = 1;
+                    applied = Dwm.DwmSetWindowAttribute(
+                        form.Handle,
+                        Dwm.DWMWA_MICA_EFFECT,
+                        ref value,
+                        Marshal.SizeOf(typeof(int))) == 0;
+                } else if(!enabled) {
+                    value = 0;
+                    Dwm.DwmSetWindowAttribute(
+                        form.Handle,
+                        Dwm.DWMWA_MICA_EFFECT,
+                        ref value,
+                        Marshal.SizeOf(typeof(int)));
+                }
+
+                Dwm.MARGINS margins = new Dwm.MARGINS(enabled && applied ? -1 : 0);
+                if(Dwm.DwmExtendFrameIntoClientArea(form.Handle, ref margins) != 0)
+                    applied = false;
+            } catch {
+                applied = false;
+            }
+
+            return enabled && applied;
         }
 
         // Applies theme colors to known control types
@@ -335,7 +384,7 @@ namespace OmenMon.AppGui {
 
         // Applies title bar theme whenever a themed form handle is recreated
         private static void EventThemeFormHandleCreated(object sender, EventArgs e) {
-            ApplyTitleBarTheme(sender as Form);
+            ApplyTheme(sender as Form);
         }
 
         // Removes closed forms from the themed form registry
