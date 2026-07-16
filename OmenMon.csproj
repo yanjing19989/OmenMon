@@ -6,7 +6,7 @@
      //  https://omenmon.github.io/
 
 -->
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <!-- <AllowUnsafeBlocks>true</AllowUnsafeBlocks> -->
         <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
@@ -18,9 +18,15 @@
         <CoreCompileDependsOn>PrepareResources;$(CompileDependsOn)</CoreCompileDependsOn>
         <Deterministic>true</Deterministic>
         <DisableWinExeOutputInference>true</DisableWinExeOutputInference>
+        <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+        <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+        <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
         <ErrorReport>prompt</ErrorReport>
+        <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <IntermediateOutputPath>Obj</IntermediateOutputPath>
         <LangVersion>11.0</LangVersion>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <OutputPath>Bin</OutputPath>
         <OutputType>WinExe</OutputType>
         <Platform>x64</Platform>
@@ -28,7 +34,8 @@
         <ProjectGuid>{F6104868-81A7-4D09-8AD2-8CF261D58319}</ProjectGuid>
         <RootNamespace>OmenMon</RootNamespace>
         <StartupObject>OmenMon.App</StartupObject>
-        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+        <TargetFramework>net48</TargetFramework>
+        <UseWindowsForms>true</UseWindowsForms>
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -41,7 +48,6 @@
         <DebugSymbols>false</DebugSymbols>
         <Optimize>true</Optimize>
     </PropertyGroup>
-    <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets"/>
     <ItemGroup>
         <None Include="OmenMon.config"/>
         <None Include="OmenMon.manifest"/>
@@ -112,12 +118,13 @@
         <Compile Include="Library\WmiInfo.cs"/>
     </ItemGroup>
     <ItemGroup>
-        <Reference Include="Microsoft.CSharp"/>
-        <Reference Include="Microsoft.Management.Infrastructure"/>
-        <Reference Include="System"/>
-        <Reference Include="System.Drawing"/>
-        <Reference Include="System.Windows.Forms"/>
-        <Reference Include="System.Xml"/>
+        <Reference Include="Microsoft.CSharp" />
+    </ItemGroup>
+    <ItemGroup>
+        <!-- Allows dotnet SDK builds without the Visual Studio .NET Framework targeting pack. -->
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net48" Version="1.0.3" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.Management.Infrastructure" Version="1.0.0" />
+        <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="OmenMon.resx">

@@ -6,13 +6,8 @@ rem     //  https://omenmon.github.io/
 rem
 set DOTNET_CLI_TELEMETRY_OPTOUT=1
 setlocal
-rem For Visual Studio 2022 Build Tools only (no IDE):
-set msbuild="%ProgramFiles%\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\amd64\MSBuild.exe"
-rem For Visual Studio 2022 Community Edition (IDE):
-set msbuild="%ProgramFiles%\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\amd64\MSBuild.exe"
-set msbuild_flags=/p:AssemblyVersion=0.0.0.0 /p:AssemblyVersionWord=Manual /p:Configuration=Release
-set nuget=%~dps0nuget.exe
-set nuget_url=https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+set project=OmenMon.csproj
+set build_flags=-p:AssemblyVersion=0.0.0.0 -p:AssemblyVersionWord=Manual -c Release
 set op_scope=build clean kill prepare test usage
 set op=%~1
 set taskkill=%SystemRoot%\System32\taskkill.exe
@@ -24,12 +19,12 @@ echo BEGIN %~n0 & goto usage
 
 :build
 call :TaskKill %result_bin%
-%msbuild% /t:Clean,Build %msbuild_flags%
+dotnet build %project% %build_flags%
 goto end
 
 :clean
 call :TaskKill %result_bin%
-%msbuild% /t:Clean
+dotnet clean %project% -c Release
 rem Handled within .csproj now:
 rem call :RecursivelyRemoveDir Bin
 rem call :RecursivelyRemoveDir Obj
@@ -40,8 +35,7 @@ call :TaskKill %result_bin%
 goto end
 
 :prepare
-if not exist %nuget% powershell Invoke-WebRequest -OutFile %nuget% -Uri %nuget_url%
-%nuget% restore
+dotnet restore %project%
 goto end
 
 :test
