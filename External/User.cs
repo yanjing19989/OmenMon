@@ -162,6 +162,14 @@ namespace OmenMon.External {
 
         [DllImport(DllName, CallingConvention = CallingConvention.Winapi)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static extern uint GetDpiForSystem();
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Winapi)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static extern uint GetDpiForWindow(IntPtr hWnd);
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Winapi)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static extern IntPtr GetDlgItem(IntPtr hDlg, int nIDDlgItem);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode)]
