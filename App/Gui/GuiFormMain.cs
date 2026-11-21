@@ -32,11 +32,20 @@ namespace OmenMon.AppGui {
         // Holds the custom font
         private Font FigureFont;
 
+        // Labels using the custom figure font
+        private Label[] FigureLabels;
+
         // Stores the class managing the recolored keyboard drawing
         internal GuiKbd Kbd;
 
-        // Stores the previous DPI value, for dynamically-updated scaling
+        // Stores the DPI that the form layout is currently scaled to
         private int LastDpi;
+
+        // Baseline GroupBox width right after Initialize() to detect if WinForms already scaled
+        private int InitialGrpSysWidth;
+
+        // Guards against re-entrant DPI synchronization
+        private bool IsSyncingDpi;
 
         // Stores both parts of the system status, so that the other part
         // does not have to be regenerated every time one changes
@@ -67,10 +76,23 @@ namespace OmenMon.AppGui {
 
             // Initialize the form components
             Initialize();
+            this.FigureLabels = new Label[] {
+                this.LblFanUnitVal, this.LblFan0Val, this.LblFan1Val,
+                this.LblFanUnitRte, this.LblFan0Rte, this.LblFan1Rte,
+                this.LblFanCountdown,
+                this.LblTmp0Val, this.LblTmp1Val, this.LblTmp2Val,
+                this.LblTmp3Val, this.LblTmp4Val, this.LblTmp5Val,
+                this.LblTmp6Val, this.LblTmp7Val, this.LblTmp8Val
+            };
+            this.InitialGrpSysWidth = this.GrpSys.Width;
+            FitClientSize();
             Gui.ApplyTheme(this);
 
-            // Pre-populate the last DPI setting to the value at launch
-            this.LastDpi = (int) Gui.GetDeviceContextDpi(IntPtr.Zero);
+            // Derive the actual DPI that AutoScaleMode.Font scaled to from the laid-out height
+            // (GetDpiForSystem can report 192 after hot-plugging a 4K monitor even when WinForms
+            // still laid out controls using the boot-time 96 DPI default font)
+            float rawLayoutDpi = 96f * this.GrpSys.Height / 75f;
+            this.LastDpi = Math.Max(96, (int) Math.Round(rawLayoutDpi / 24f) * 24);
 
             // For keyboards that support backlight and color settings
             if(Context.Op.Platform.System.GetKbdBacklightSupport()
@@ -112,13 +134,37 @@ namespace OmenMon.AppGui {
 
         // Handles component disposal
         protected override void Dispose(bool isDisposing) {
-	
-            if(isDisposing && Components != null)
-                Components.Dispose();
-	
+
+            if(isDisposing) {
+                if(this.FigureFont != null) {
+                    this.FigureFont.Dispose();
+                    this.FigureFont = null;
+                }
+                if(Components != null)
+                    Components.Dispose();
+            }
+
             // Perform the usual tasks
             base.Dispose(isDisposing);
-	
+
+        }
+
+        // Syncs scaling when created directly on a monitor whose DPI differs from launch DPI
+        protected override void OnHandleCreated(EventArgs e) {
+            base.OnHandleCreated(e);
+            SyncDpi();
+        }
+
+        // Keeps custom pixel fonts and ClientSize aligned after WinForms handles WM_DPICHANGED
+        protected override void OnDpiChanged(DpiChangedEventArgs e) {
+            base.OnDpiChanged(e);
+
+            if(e.DeviceDpiNew > 0 && e.DeviceDpiOld > 0) {
+                float factor = (float) e.DeviceDpiNew / e.DeviceDpiOld;
+                ScalePixelFonts(factor);
+                this.LastDpi = e.DeviceDpiNew;
+                FitClientSize();
+            }
         }
 
         // Makes the F1 key open the About dialog
@@ -139,23 +185,9 @@ namespace OmenMon.AppGui {
             return base.ProcessDialogKey(keyData);
         }
 
-        // Overrides the window procedure to capture a DPI-change event
-        // Catching this via the .NET API is conditional upon a configuration setting,
-        // which would require a *.exe.config file to be present in the same location
-        // Much better to keep everything contained to a single file, so not an option
+        // Overrides the window procedure (WM_DPICHANGED is handled natively via OnDpiChanged)
         protected override void WndProc(ref Message m) {
-
-            // Alternatively, override DefWndProc to intercept WM_GETDPISCALEDSIZE,
-            // which gets dispatched before any DPI changes will have happened
-            if(m.Msg == User32.WM_DPICHANGED)
-
-                    // Update the form to match the new scaling
-                    // Parameter is the horizontal DPI, but vertical is always the same
-                    UpdateDpi(m.WParam.ToInt32() & 0xFFFF);
-
-            // Run the base procedure
             base.WndProc(ref m);
-
         }
 #endregion
 
@@ -522,8 +554,11 @@ namespace OmenMon.AppGui {
             Context.UpdateMonitorTick = 0;
 
             // Update everything
-            if(this.Visible)
+            if(this.Visible) {
+                SyncDpi();
+                FitClientSize();
                 UpdateAll();
+            }
 
         }
 #endregion
@@ -637,8 +672,8 @@ namespace OmenMon.AppGui {
         // Updates all of the form
         public void UpdateAll() {
 
-            // Update form dimensions following a scaling change
-            UpdateDpi(this.LastDpi);
+            // Ensure form scaling matches the current monitor DPI
+            SyncDpi();
 
             // Update the fan group monitoring section
             UpdateFan();
@@ -657,6 +692,26 @@ namespace OmenMon.AppGui {
 
         }
 
+        // Sizes the client area to fit all laid-out GroupBoxes with symmetric margins
+        private void FitClientSize() {
+            int margin = this.GrpSys.Left;
+            int maxRight = 0;
+            int maxBottom = 0;
+
+            foreach(Control control in this.Controls) {
+                if(control.Right > maxRight)
+                    maxRight = control.Right;
+                if(control.Bottom > maxBottom)
+                    maxBottom = control.Bottom;
+            }
+
+            Size required = new Size(maxRight + margin, maxBottom + margin);
+            if(this.AutoSize)
+                this.AutoSize = false;
+            if(this.ClientSize != required)
+                this.ClientSize = required;
+        }
+
         // Applies the current theme and refreshes theme-dependent text
         public void ApplyTheme() {
             Gui.ApplyTheme(this);
@@ -665,31 +720,78 @@ namespace OmenMon.AppGui {
             this.Invalidate(true);
         }
 
-        // Updates the form dimensions following a scaling change
-        private void UpdateDpi(int dpi) {
+        // Scales the form when its monitor DPI differs from the DPI it was laid out for
+        // (e.g. process booted on 1080p, then 4K monitor was attached before opening the UI)
+        public void SyncDpi() {
+            if(this.IsSyncingDpi || !this.IsHandleCreated)
+                return;
 
-            // Skip if configured not to resize
-            if(Config.GuiDpiChangeResize) {
+            int targetDpi = Gui.GetWindowDpi(this.Handle);
+            if(targetDpi <= 0 || this.LastDpi <= 0 || targetDpi == this.LastDpi)
+                return;
 
-                // Suspend the layout
+            float factor = (float) targetDpi / this.LastDpi;
+            this.IsSyncingDpi = true;
+            AutoScaleMode savedAutoScale = this.AutoScaleMode;
+            try {
+                // Skip control/font rescaling if WinForms PerMonitorV2 already scaled the controls
+                bool alreadyScaled = this.InitialGrpSysWidth > 0
+                    && Math.Abs((float) this.GrpSys.Width / this.InitialGrpSysWidth - factor) < 0.15f;
+
                 this.SuspendLayout();
-                this.AutoSize = false;
+                if(!alreadyScaled) {
+                    // Prevent setting this.Font from triggering PerformAutoScale on top of Scale()
+                    this.AutoScaleMode = AutoScaleMode.None;
+                    this.Font = new Font(
+                        this.Font.FontFamily,
+                        this.Font.Size * factor,
+                        this.Font.Style,
+                        this.Font.Unit);
+                    this.Scale(new SizeF(factor, factor));
+                    if(this.GrpTmp != null) {
+                        foreach(Control control in this.GrpTmp.Controls) {
+                            if(control is Label lbl && lbl.Font != null && lbl.Font.Strikeout)
+                                lbl.Font = new Font(this.Font, FontStyle.Strikeout);
+                        }
+                    }
+                }
+                ScalePixelFonts(factor);
+                this.LastDpi = targetDpi;
+                FitClientSize();
+                this.ResumeLayout(true);
+            } finally {
+                this.AutoScaleMode = savedAutoScale;
+                this.IsSyncingDpi = false;
+            }
+        }
 
-                // Adjust the client size to account for differences
-                // if the form gets scaled dynamically to another DPI setting
-                this.Size = new Size(
-                    (int) (1080 + ((dpi - 96) * Config.DpiSizeAdjFactorX / 100)),
-                    (int) (441 + ((dpi - 96) * Config.DpiSizeAdjFactorY / 100)));
-
-                // Resume the layout
-                this.AutoSize = true;
-                this.ResumeLayout(false);
-
-                // Update the last DPI value for the next rescaling
-                this.LastDpi = dpi;
-
+        // Scales pixel-based fonts proportionally by a DPI ratio
+        private void ScalePixelFonts(float factor) {
+            if(this.FigureFont != null) {
+                Font newFigureFont = new Font(
+                    this.FigureFont.FontFamily,
+                    this.FigureFont.Size * factor,
+                    this.FigureFont.Style,
+                    this.FigureFont.Unit);
+                Font oldFigureFont = this.FigureFont;
+                this.FigureFont = newFigureFont;
+                if(this.FigureLabels != null) {
+                    foreach(Label label in this.FigureLabels)
+                        label.Font = newFigureFont;
+                }
+                oldFigureFont.Dispose();
             }
 
+            if(Config.GuiSysInfoFontSize > 0 && this.RtfSysInfo != null && this.RtfSysInfo.Font != null) {
+                this.RtfSysInfo.Font = new Font(
+                    this.RtfSysInfo.Font.FontFamily,
+                    this.RtfSysInfo.Font.Size * factor,
+                    this.RtfSysInfo.Font.Style,
+                    this.RtfSysInfo.Font.Unit);
+            }
+
+            if(this.SysInfo != null)
+                UpdateSysRtf();
         }
 
         // Updates the fan group monitoring section

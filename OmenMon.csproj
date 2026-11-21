@@ -9,6 +9,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <!-- <AllowUnsafeBlocks>true</AllowUnsafeBlocks> -->
+        <AppConfig>OmenMon.exe.config</AppConfig>
         <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
         <ApplicationManifest>OmenMon.manifest</ApplicationManifest>
         <AssemblyName>OmenMon</AssemblyName>
@@ -49,7 +50,7 @@
         <Optimize>true</Optimize>
     </PropertyGroup>
     <ItemGroup>
-        <None Include="OmenMon.config"/>
+        <None Include="OmenMon.exe.config"/>
         <None Include="OmenMon.manifest"/>
         <None Include="Packages.config"/>
     </ItemGroup>

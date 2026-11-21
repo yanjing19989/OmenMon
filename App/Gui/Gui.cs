@@ -488,6 +488,31 @@ namespace OmenMon.AppGui {
 
             }
         }
+
+        // Retrieve the process launch-time system DPI (used by WinForms AutoScaleMode.Font)
+        public static int GetSystemDpi() {
+            try {
+                uint dpi = User32.GetDpiForSystem();
+                if(dpi > 0)
+                    return (int) dpi;
+            } catch { }
+
+            int fallback = (int) Math.Round(GetDeviceContextDpi(IntPtr.Zero));
+            return fallback > 0 ? fallback : 96;
+        }
+
+        // Retrieve the current effective DPI for a window
+        public static int GetWindowDpi(IntPtr handle) {
+            if(handle != IntPtr.Zero) {
+                try {
+                    uint dpi = User32.GetDpiForWindow(handle);
+                    if(dpi > 0)
+                        return (int) dpi;
+                } catch { }
+            }
+
+            return GetSystemDpi();
+        }
 #endregion
 
 #region Visual
